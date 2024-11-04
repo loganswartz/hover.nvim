@@ -27,7 +27,7 @@ local function close_preview_autocmd(winid, hover_bufnr, bufnr)
   api.nvim_create_autocmd('BufEnter', {
     group = augroup,
     callback = function()
-      close_preview_window(winid, {hover_bufnr, bufnr})
+      close_preview_window(winid, { hover_bufnr, bufnr })
     end,
   })
 
@@ -75,13 +75,13 @@ local default_border = {
 
 --- @param width integer
 --- @param height integer
---- @param opts vim.api.keyset.float_config
---- @return vim.api.keyset.float_config
+--- @param opts vim.api.keyset.win_config
+--- @return vim.api.keyset.win_config
 local function make_floating_popup_options(width, height, opts)
   opts = opts or {}
 
   local anchor = ''
-  local row, col
+  local row, col --- @type integer,integer
 
   local lines_above = vim.fn.winline() - 1
   local lines_below = vim.fn.winheight(0) - lines_above
@@ -105,26 +105,26 @@ local function make_floating_popup_options(width, height, opts)
   end
 
   return {
-    anchor    = anchor,
-    col       = col,
-    height    = height,
+    anchor = anchor,
+    col = col,
+    height = height,
     focusable = opts.focusable,
-    relative  = opts.relative or 'cursor',
-    row       = row,
-    style     = 'minimal',
-    width     = width,
-    border    = opts.border or default_border,
-    zindex    = opts.zindex or 50,
+    relative = opts.relative or 'cursor',
+    row = row,
+    style = 'minimal',
+    width = width,
+    border = opts.border or default_border,
+    zindex = opts.zindex or 50,
   }
 end
 
 local BORDER_WIDTHS = {
-  none    = 0,
-  single  = 2,
-  double  = 2,
+  none = 0,
+  single = 2,
+  double = 2,
   rounded = 2,
-  solid   = 2,
-  shadow  = 1,
+  solid = 2,
+  shadow = 1,
 }
 
 local function get_border_width(opts)
@@ -132,20 +132,23 @@ local function get_border_width(opts)
 
   if type(border) == 'string' then
     if not BORDER_WIDTHS[border] then
-      error(string.format(
-        'invalid floating preview border: %s. :help vim.api.nvim_open_win()',
-        vim.inspect(border)
-      ))
+      error(
+        string.format(
+          'invalid floating preview border: %s. :help vim.api.nvim_open_win()',
+          vim.inspect(border)
+        )
+      )
     end
     return BORDER_WIDTHS[border]
   end
 
-
   if 8 % #border ~= 0 then
-    error(string.format(
-      'invalid floating preview border: %s. :help vim.api.nvim_open_win()',
-      vim.inspect(border)
-    ))
+    error(
+      string.format(
+        'invalid floating preview border: %s. :help vim.api.nvim_open_win()',
+        vim.inspect(border)
+      )
+    )
   end
 
   ---@param id integer
@@ -177,12 +180,12 @@ end
 local function make_floating_popup_size(contents, opts)
   opts = opts or {}
 
-  local width      = opts.width
-  local height     = opts.height
-  local wrap_at    = opts._wrap_at
-  local max_width  = opts.max_width
+  local width = opts.width
+  local height = opts.height
+  local wrap_at = opts._wrap_at
+  local max_width = opts.max_width
   local max_height = opts.max_height
-  local line_widths = {}
+  local line_widths = {} --- @type table<integer,integer>
 
   if not width then
     width = 1 -- not zero, avoid modulo by zero if content is empty
@@ -320,7 +323,7 @@ function M.open_floating_preview(contents, bufnr, syntax, opts)
   vim.keymap.set('n', 'q', '<cmd>bdelete<cr>', {
     buffer = floating_bufnr,
     silent = true,
-    nowait = true
+    nowait = true,
   })
 
   close_preview_autocmd(hover_winid, floating_bufnr, cbuf)

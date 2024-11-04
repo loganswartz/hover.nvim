@@ -51,6 +51,7 @@ local function filter_diagnostics(diagnostics, bufnr)
   local col = pos[2]
   if scope == 'line' then
     --- @param d vim.Diagnostic
+    --- @return boolean
     diagnostics = vim.tbl_filter(function(d)
       return lnum >= d.lnum
         and lnum <= d.end_lnum
@@ -60,6 +61,7 @@ local function filter_diagnostics(diagnostics, bufnr)
     -- If `col` is past the end of the line, show if the cursor is on the last char in the line
     local line_length = #api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, true)[1]
     --- @param d vim.Diagnostic
+    --- @return boolean
     diagnostics = vim.tbl_filter(function(d)
       return lnum >= d.lnum
         and lnum <= d.end_lnum
@@ -71,6 +73,7 @@ local function filter_diagnostics(diagnostics, bufnr)
 end
 
 --- @param bufnr integer
+--- @return boolean
 local function enabled(bufnr)
   local buffer_diagnostics = vim.diagnostic.get(bufnr)
   local diagnostics = filter_diagnostics(buffer_diagnostics, bufnr)
@@ -201,12 +204,12 @@ local function execute(opts, done)
     end
   end
 
-  done { bufnr = float_bufnr }
+  done({ bufnr = float_bufnr })
 end
 
-require('hover').register {
+require('hover').register({
   name = 'Diagnostics',
   priority = 1001, -- above lsp
   enabled = enabled,
   execute = execute,
-}
+})
